@@ -17,6 +17,7 @@ import {
   courbeQuotidienne, barresHoraires, barresImpact, anneauPieds,
 } from './charts.js';
 import { genererDemo } from './demo.js';
+import { demanderConfirmation, demanderTexte } from './dialogue.js';
 
 const LIBELLES_INTENSITE = {
   1: 'À peine perceptible',
@@ -105,12 +106,13 @@ function selecteurPuces(conteneur, suggestions, { repliable = false } = {}) {
 
     const ajout = creer('button', 'puce puce-ajout', '+ autre…');
     ajout.type = 'button';
-    ajout.addEventListener('click', () => {
-      const valeur = window.prompt('Ajouter un élément à noter :');
-      const propre = (valeur || '').trim();
-      if (propre) {
-        choisis.add(propre);
-        if (!suggestions.includes(propre)) suggestions.push(propre);
+    ajout.addEventListener('click', async () => {
+      const valeur = await demanderTexte('Ajouter un élément à noter', {
+        exemple: 'Ex. : chaussures de sécurité, sauna, houblon…',
+      });
+      if (valeur) {
+        choisis.add(valeur);
+        if (!suggestions.includes(valeur)) suggestions.push(valeur);
         deplie = true;
         rendre();
       }
@@ -341,12 +343,15 @@ function ligneSaisie(s) {
   effacer.type = 'button';
   effacer.title = 'Supprimer';
   effacer.setAttribute('aria-label', 'Supprimer cette note');
-  effacer.addEventListener('click', () => {
-    if (window.confirm('Supprimer cette note ?')) {
-      etat.data = supprimerSaisie(etat.data, s.id);
-      rafraichir();
-      notifier('Note supprimée.');
-    }
+  effacer.addEventListener('click', async () => {
+    const confirme = await demanderConfirmation(
+      `Supprimer la note de ${formatHeure(s.horodatage)} (${s.intensite}/10) ?`,
+      { valider: 'Supprimer', danger: true },
+    );
+    if (!confirme) return;
+    etat.data = supprimerSaisie(etat.data, s.id);
+    rafraichir();
+    notifier('Note supprimée.');
   });
   actions.appendChild(modifier);
   actions.appendChild(effacer);
@@ -824,9 +829,14 @@ function brancherEvenements() {
     e.target.value = '';
   });
 
-  $('#jeu-demo').addEventListener('click', () => {
-    if (etat.data.saisies.length
-      && !window.confirm('Des notes existent déjà. Ajouter par-dessus le jeu de démonstration ?')) return;
+  $('#jeu-demo').addEventListener('click', async () => {
+    if (etat.data.saisies.length) {
+      const confirme = await demanderConfirmation(
+        'Vos notes existent déjà. Ajouter 30 jours de données fictives par-dessus ?',
+        { valider: 'Ajouter l’exemple' },
+      );
+      if (!confirme) return;
+    }
     const demo = genererDemo(30);
     etat.data = enregistrerTout({ ...etat.data, saisies: [...etat.data.saisies, ...demo] });
     construireFormulaire();
@@ -834,9 +844,19 @@ function brancherEvenements() {
     allerA('analyse');
   });
 
-  $('#tout-effacer').addEventListener('click', () => {
-    if (!window.confirm('Effacer définitivement toutes les notes de cet appareil ?')) return;
-    if (!window.confirm('Cette action est irréversible. Avez-vous exporté une sauvegarde ?')) return;
+  $('#tout-effacer').addEventListener('click', async () => {
+    const nb = etat.data.saisies.length;
+    if (!nb) { notifier('Il n’y a rien à effacer.'); return; }
+    const premier = await demanderConfirmation(
+      `Effacer définitivement ${nb} note${nb > 1 ? 's' : ''} de cet appareil ?`,
+      { valider: 'Effacer', danger: true },
+    );
+    if (!premier) return;
+    const second = await demanderConfirmation(
+      'Cette action est irréversible. Avez-vous exporté une sauvegarde ?',
+      { valider: 'Oui, effacer', annuler: 'Non, revenir', danger: true },
+    );
+    if (!second) return;
     etat.data = enregistrerTout({ ...etat.data, saisies: [], etiquettes: {} });
     construireFormulaire();
     rafraichir();
@@ -850,7 +870,11 @@ function demarrer() {
   brancherEvenements();
   allerA('saisie');
 
-  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  // Le mode hors ligne n'est activé que pour la version installable (celle qui
+  // déclare un manifeste). Une page simplement hébergée ne doit pas garder de
+  // version en cache à l'insu de l'utilisateur.
+  const installable = document.querySelector('link[rel="manifest"]');
+  if (installable && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
     navigator.serviceWorker.register('sw.js').catch(() => { /* hors ligne non critique */ });
   }
 }

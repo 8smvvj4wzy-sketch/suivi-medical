@@ -13,6 +13,8 @@
   --accent: #0f766e;
   --accent-clair: #ccfbf1;
   --accent-fonce: #115e59;
+  --sur-accent: #ffffff;
+  --texte-sur-accent-clair: #115e59;
   --danger: #dc2626;
   --danger-doux: #fef2f2;
   --ombre: 0 1px 2px rgba(15, 23, 42, .06), 0 4px 16px rgba(15, 23, 42, .05);
@@ -32,8 +34,9 @@
   --gouttiere: 16px;
 }
 
+/* Thème sombre du système, sauf si le clair est explicitement demandé. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --fond: #0b1220;
     --fond-carte: #131c2e;
     --texte: #e8eef7;
@@ -42,6 +45,8 @@
     --accent: #2dd4bf;
     --accent-clair: #124e4a;
     --accent-fonce: #5eead4;
+    --sur-accent: #06231f;
+    --texte-sur-accent-clair: #2dd4bf;
     --danger: #f87171;
     --danger-doux: #2a1516;
     --trait-faible: #475569;
@@ -49,7 +54,32 @@
   }
 }
 
+/* Thème sombre explicitement demandé par l'hôte de la page. */
+:root[data-theme="dark"] {
+    --fond: #0b1220;
+    --fond-carte: #131c2e;
+    --texte: #e8eef7;
+    --texte-doux: #94a3b8;
+    --bordure: #23304a;
+    --accent: #2dd4bf;
+    --accent-clair: #124e4a;
+    --accent-fonce: #5eead4;
+    --sur-accent: #06231f;
+    --texte-sur-accent-clair: #2dd4bf;
+    --danger: #f87171;
+    --danger-doux: #2a1516;
+    --trait-faible: #475569;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .4);
+}
+
 * { box-sizing: border-box; }
+
+/* L'application va bord à bord, mais le contenu évite les encoches et la
+   barre système des téléphones. */
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 body {
   margin: 0;
@@ -67,7 +97,8 @@ h1, h2, h3 { line-height: 1.25; }
 .entete {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-fonce) 100%);
   color: #fff;
-  padding: calc(env(safe-area-inset-top, 0px) + 18px) var(--gouttiere) 18px;
+  padding-block: 18px;
+  padding-inline: var(--gouttiere);
 }
 .entete-contenu { max-width: 780px; margin: 0 auto; }
 .entete h1 { margin: 0; font-size: 19px; font-weight: 650; letter-spacing: -.01em; }
@@ -82,7 +113,7 @@ h1, h2, h3 { line-height: 1.25; }
   border-bottom: 1px solid var(--bordure);
   padding: 6px var(--gouttiere);
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 20;
   overflow-x: auto;
   justify-content: center;
@@ -102,8 +133,7 @@ h1, h2, h3 { line-height: 1.25; }
   white-space: nowrap;
 }
 .onglet:hover { background: var(--fond); color: var(--texte); }
-.onglet.actif { background: var(--accent-clair); color: var(--accent-fonce); font-weight: 600; }
-@media (prefers-color-scheme: dark) { .onglet.actif { color: var(--accent); } }
+.onglet.actif { background: var(--accent-clair); color: var(--texte-sur-accent-clair); font-weight: 600; }
 
 /* ------------------------------ Vues ------------------------------- */
 
@@ -192,9 +222,8 @@ main { max-width: 780px; margin: 0 auto; padding: var(--gouttiere); }
 }
 .segment:hover { border-color: var(--accent); }
 .segment.actif {
-  background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600;
+  background: var(--accent); border-color: var(--accent); color: var(--sur-accent); font-weight: 600;
 }
-@media (prefers-color-scheme: dark) { .segment.actif { color: #06231f; } }
 
 /* ------------------------------ Puces ------------------------------ */
 
@@ -211,9 +240,8 @@ main { max-width: 780px; margin: 0 auto; padding: var(--gouttiere); }
 }
 .puce:hover { border-color: var(--accent); }
 .puce.selectionnee {
-  background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 550;
+  background: var(--accent); border-color: var(--accent); color: var(--sur-accent); font-weight: 550;
 }
-@media (prefers-color-scheme: dark) { .puce.selectionnee { color: #06231f; } }
 .puce-ajout, .puce-plus { border-style: dashed; color: var(--texte-doux); }
 .puce-action {
   border: 1px solid var(--bordure); background: var(--fond-carte); color: var(--texte-doux);
@@ -254,9 +282,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 }
 .bouton:hover { border-color: var(--accent); }
 .bouton.principal {
-  background: var(--accent); border-color: var(--accent); color: #fff; font-size: 16px;
+  background: var(--accent); border-color: var(--accent); color: var(--sur-accent); font-size: 16px;
 }
-@media (prefers-color-scheme: dark) { .bouton.principal { color: #06231f; } }
 .bouton.principal:hover { filter: brightness(1.07); }
 .bouton.discret { color: var(--texte-doux); }
 .bouton.danger { border-color: var(--danger); color: var(--danger); background: var(--danger-doux); }
@@ -372,10 +399,9 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .reco-numero {
   flex: 0 0 auto; display: grid; place-items: center;
   width: 23px; height: 23px; border-radius: 50%;
-  background: var(--accent-clair); color: var(--accent-fonce);
+  background: var(--accent-clair); color: var(--texte-sur-accent-clair);
   font-size: 12px; font-weight: 700;
 }
-@media (prefers-color-scheme: dark) { .reco-numero { color: var(--accent); } }
 .reco-haute .reco-numero { background: var(--i5); color: #fff; }
 
 .tableau { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 12px; }
@@ -413,3 +439,24 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* --------------------------- Boîtes de dialogue -------------------------- */
+
+.dialogue {
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  background: var(--fond-carte);
+  color: var(--texte);
+  padding: 20px;
+  width: min(420px, calc(100vw - 32px));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .3);
+}
+.dialogue::backdrop { background: rgba(8, 15, 30, .55); }
+.dialogue-message { margin: 0 0 14px; font-size: 15px; line-height: 1.45; }
+.dialogue-champ {
+  width: 100%; margin-bottom: 16px; padding: 11px;
+  border: 1px solid var(--bordure); border-radius: 9px;
+  background: var(--fond); color: var(--texte); font: inherit; font-size: 15px;
+}
+.dialogue-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.dialogue-actions .bouton { flex: 1 1 auto; padding: 11px 16px; font-size: 14.5px; }

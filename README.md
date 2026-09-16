@@ -73,6 +73,25 @@ Sur téléphone, l'application s'installe depuis le navigateur
 Hébergement : n'importe quel hébergeur de fichiers statiques convient
 (GitHub Pages, par exemple), il n'y a rien à compiler.
 
+## Déploiement
+
+L'application est statique : il n'y a rien à compiler, tout hébergeur de fichiers
+convient.
+
+**GitHub Pages** — le workflow `.github/workflows/pages.yml` s'en charge : à chaque
+poussée sur `main`, il lance les tests puis publie le dépôt tel quel sur
+
+```
+https://8smvvj4wzy-sketch.github.io/suivi-medical/
+```
+
+Le workflow active Pages tout seul au premier passage (`enablement: true`). Si
+l'organisation l'interdit, il suffit de l'activer une fois dans
+*Settings → Pages → Source : GitHub Actions*.
+
+**Ailleurs** — copier le dépôt sur n'importe quel hébergeur statique, ou ouvrir
+`npm start` en local. Aucune variable d'environnement, aucune base de données.
+
 ## Tests
 
 ```bash
