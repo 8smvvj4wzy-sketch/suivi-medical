@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Journal de suivi des douleurs nerveuses du pied : intensité, fatigue, aliments et activités déclenchantes, avec analyse des tendances.">
+<meta name="theme-color" content="#0f766e">
+<title>Suivi des douleurs nerveuses du pied</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icone.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="entete">
+  <div class="entete-contenu">
+    <h1>Suivi des douleurs nerveuses du pied</h1>
+    <p class="sous-titre">Noter maintenant, comprendre ensuite.</p>
+  </div>
+</header>
+
+<nav class="onglets" role="tablist" aria-label="Sections">
+  <button class="onglet actif" role="tab" aria-selected="true" data-vue="saisie">
+    <span aria-hidden="true">✎</span> Noter
+  </button>
+  <button class="onglet" role="tab" aria-selected="false" data-vue="journal">
+    <span aria-hidden="true">📓</span> Journal
+  </button>
+  <button class="onglet" role="tab" aria-selected="false" data-vue="analyse">
+    <span aria-hidden="true">📈</span> Analyse
+  </button>
+  <button class="onglet" role="tab" aria-selected="false" data-vue="donnees">
+    <span aria-hidden="true">⚙️</span> Données
+  </button>
+</nav>
+
+<main>
+
+  <!-- ------------------------------ SAISIE ------------------------------ -->
+  <section id="vue-saisie" class="vue active" role="tabpanel" aria-label="Nouvelle note">
+    <form id="formulaire" novalidate>
+      <input type="hidden" id="saisie-id">
+
+      <div class="carte carte-intensite">
+        <div class="ligne-titre">
+          <h2>Intensité de la douleur</h2>
+          <output id="valeur-intensite" class="pastille-intensite">5</output>
+        </div>
+        <input type="range" id="intensite" min="1" max="10" step="1" value="5"
+               class="curseur" aria-describedby="libelle-intensite">
+        <div class="graduations" aria-hidden="true">
+          <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+          <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+        </div>
+        <p id="libelle-intensite" class="libelle-curseur">Modérée — gênante mais supportable</p>
+      </div>
+
+      <div class="carte">
+        <h2>Quel pied&nbsp;?</h2>
+        <div class="segments" id="choix-pied" role="radiogroup" aria-label="Pied concerné"></div>
+      </div>
+
+      <div class="carte">
+        <h2>Quand&nbsp;?</h2>
+        <div class="champs-2">
+          <label>Date
+            <input type="date" id="date-saisie" required>
+          </label>
+          <label>Heure
+            <input type="time" id="heure-saisie" required>
+          </label>
+        </div>
+        <div class="raccourcis-heure">
+          <button type="button" class="puce-action" data-heure="maintenant">Maintenant</button>
+          <button type="button" class="puce-action" data-heure="reveil">Au réveil</button>
+          <button type="button" class="puce-action" data-heure="midi">Midi</button>
+          <button type="button" class="puce-action" data-heure="soir">Ce soir</button>
+        </div>
+      </div>
+
+      <div class="carte">
+        <h2>Où exactement&nbsp;? <span class="facultatif">facultatif</span></h2>
+        <div class="puces" id="choix-zones"></div>
+        <h2 class="espace-haut">Comment ça fait&nbsp;? <span class="facultatif">facultatif</span></h2>
+        <div class="puces" id="choix-types"></div>
+      </div>
+
+      <div class="carte">
+        <h2>État général</h2>
+        <label class="bloc-curseur">
+          <span class="ligne-curseur">Fatigue du moment <output id="valeur-fatigue">5</output>/10</span>
+          <input type="range" id="fatigue" min="0" max="10" step="1" value="5" class="curseur curseur-sobre">
+        </label>
+        <label class="bloc-curseur">
+          <span class="ligne-curseur">Qualité de la nuit dernière <output id="valeur-sommeil">5</output>/10</span>
+          <input type="range" id="sommeil" min="0" max="10" step="1" value="5" class="curseur curseur-sobre">
+          <small class="aide">0 = nuit très mauvaise, 10 = excellente nuit.</small>
+        </label>
+      </div>
+
+      <div id="categories-facteurs"></div>
+
+      <div class="carte">
+        <h2>Note libre <span class="facultatif">facultatif</span></h2>
+        <textarea id="notes" rows="3" placeholder="Ex. : douleur apparue 2 h après le repas, en descendant les escaliers…"></textarea>
+      </div>
+
+      <div class="actions-formulaire">
+        <button type="submit" class="bouton principal" id="bouton-enregistrer">Enregistrer la note</button>
+        <button type="button" class="bouton discret" id="bouton-annuler-edition" hidden>Annuler la modification</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ------------------------------ JOURNAL ------------------------------ -->
+  <section id="vue-journal" class="vue" role="tabpanel" aria-label="Journal" hidden>
+    <div class="carte carte-filtres">
+      <div class="champs-2">
+        <label>Filtrer par pied
+          <select id="filtre-pied">
+            <option value="">Tous</option>
+            <option value="gauche">Pied gauche</option>
+            <option value="droit">Pied droit</option>
+            <option value="les-deux">Les deux</option>
+          </select>
+        </label>
+        <label>Intensité minimale
+          <select id="filtre-intensite">
+            <option value="1">Toutes</option>
+            <option value="4">4 et plus</option>
+            <option value="6">6 et plus</option>
+            <option value="8">8 et plus</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <div id="liste-journal"></div>
+  </section>
+
+  <!-- ------------------------------ ANALYSE ------------------------------ -->
+  <section id="vue-analyse" class="vue" role="tabpanel" aria-label="Analyse" hidden>
+    <div id="contenu-analyse"></div>
+  </section>
+
+  <!-- ------------------------------ DONNÉES ------------------------------ -->
+  <section id="vue-donnees" class="vue" role="tabpanel" aria-label="Données" hidden>
+    <div class="carte">
+      <h2>Vos données restent chez vous</h2>
+      <p class="texte">
+        Tout est enregistré dans ce navigateur, sur cet appareil. Rien n’est envoyé sur Internet,
+        il n’y a ni compte ni serveur. En contrepartie, effacer les données du navigateur efface
+        le suivi&nbsp;: <strong>exportez une sauvegarde régulièrement</strong>.
+      </p>
+      <p class="texte" id="etat-stockage"></p>
+    </div>
+
+    <div class="carte">
+      <h2>Exporter</h2>
+      <div class="rangee-boutons">
+        <button class="bouton" id="export-json">Sauvegarde (JSON)</button>
+        <button class="bouton" id="export-csv">Tableur (CSV)</button>
+        <button class="bouton" id="export-rapport">Rapport pour le médecin</button>
+      </div>
+      <small class="aide">Le rapport s’ouvre dans un nouvel onglet, prêt à imprimer ou à enregistrer en PDF.</small>
+    </div>
+
+    <div class="carte">
+      <h2>Importer une sauvegarde</h2>
+      <input type="file" id="import-fichier" accept="application/json,.json">
+      <small class="aide">Les saisies déjà présentes ne sont pas dupliquées.</small>
+      <p id="message-import" class="message" hidden></p>
+    </div>
+
+    <div class="carte">
+      <h2>Bac à sable</h2>
+      <p class="texte">Pour voir à quoi ressemble l’analyse avant d’avoir assez de données&nbsp;:</p>
+      <div class="rangee-boutons">
+        <button class="bouton discret" id="jeu-demo">Charger un exemple de 30 jours</button>
+      </div>
+    </div>
+
+    <div class="carte carte-danger">
+      <h2>Tout effacer</h2>
+      <p class="texte">Supprime définitivement toutes les saisies de cet appareil.</p>
+      <button class="bouton danger" id="tout-effacer">Effacer le suivi</button>
+    </div>
+
+    <div class="carte">
+      <h2>Avertissement</h2>
+      <p class="texte">
+        Cette application est un carnet de suivi personnel. Elle ne pose aucun diagnostic et ne
+        remplace pas un avis médical. Les liens qu’elle détecte sont des <em>corrélations
+        statistiques</em>, pas des causes démontrées&nbsp;: elles servent à orienter la discussion
+        avec un professionnel de santé et à guider vos propres tests.
+      </p>
+      <p class="texte">
+        Consultez sans attendre en cas de perte de sensibilité qui progresse, de faiblesse
+        musculaire, de plaie du pied qui ne guérit pas, ou d’une douleur qui devient brutalement
+        beaucoup plus intense.
+      </p>
+    </div>
+  </section>
+</main>
+
+<div id="notification" class="notification" role="status" aria-live="polite" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

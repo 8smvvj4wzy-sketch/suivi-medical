@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Suivi des douleurs du pied">
+  <rect width="512" height="512" rx="112" fill="#0f766e"/>
+  <g fill="#ccfbf1">
+    <ellipse cx="168" cy="268" rx="64" ry="80"/>
+    <ellipse cx="176" cy="378" rx="44" ry="50"/>
+    <circle cx="116" cy="176" r="19"/>
+    <circle cx="160" cy="156" r="21"/>
+    <circle cx="206" cy="160" r="18"/>
+    <circle cx="242" cy="182" r="15"/>
+  </g>
+  <path d="M300 286h132M300 348h132M300 410h92" stroke="#5eead4" stroke-width="26" stroke-linecap="round" fill="none"/>
+  <circle cx="300" cy="170" r="26" fill="#5eead4"/>
+</svg>
