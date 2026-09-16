@@ -1,0 +1,12 @@
+{
+  "name": "suivi-medical",
+  "version": "1.0.0",
+  "description": "Journal de suivi des douleurs nerveuses du pied, avec analyse des tendances et hypothèses.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "start": "node serveur.js"
+  },
+  "license": "MIT"
+}

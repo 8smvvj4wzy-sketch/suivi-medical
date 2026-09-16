@@ -1,0 +1,17 @@
+{
+  "name": "Suivi des douleurs nerveuses du pied",
+  "short_name": "Suivi douleur",
+  "description": "Journal des douleurs nerveuses du pied : intensité, fatigue, déclencheurs, et analyse des tendances.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fa",
+  "theme_color": "#0f766e",
+  "lang": "fr",
+  "icons": [
+    { "src": "icons/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
